@@ -1,6 +1,6 @@
-# Google Sites Jira Releases Dashboard Guide
+# Ibex Jira Releases Web App Guide
 
-A lightweight, secure, responsive, and themeable alternative to Jira's default releases page, designed to be embedded directly into Google Sites.
+A lightweight, secure, responsive, and themeable Google Apps Script web app for viewing and updating Ibex Jira release versions.
 
 ---
 
@@ -12,7 +12,7 @@ A lightweight, secure, responsive, and themeable alternative to Jira's default r
 - **Secure Backend Proxy:** Jira authentication credentials (`JIRA_USER_EMAIL` and `JIRA_API_TOKEN`) reside exclusively inside Google Apps Script `Script Properties`. They are **never** exposed in client-side HTML/JavaScript or to site visitors.
 - **Hourly Caching:** Google Apps Script `CacheService` caches Jira releases data for 1 hour (3600 seconds) to ensure near-instant site loading times.
 - **On-Demand Refresh:** A clean "Refresh" button on the UI allows users to invalidate the cache and fetch live data immediately.
-- **Google Sites Embedding:** Configured with `XFrameOptionsMode.ALLOWALL` for responsive iframe embedding.
+- **Optional Google Sites Embedding:** Configured with `XFrameOptionsMode.ALLOWALL` so the web app can also be embedded in a Google Site when needed.
 - **Release Selection:** Shows non-archived, unreleased versions with a planned release date, plus non-archived versions released during calendar year 2026. Released versions are newest first; active versions are ordered by their planned date.
 - **Collapsible Descriptions:** Each release card starts with one **Show description** control. When expanded, its description provides a compact **Edit** action.
 - **Domain-Restricted Description Editing:** Signed-in `ibex-ai.com` users can edit a release description. The update is sent from Apps Script to Jira with the server-side service account, then the one-hour release cache is cleared so refreshed results show the saved value.
@@ -47,7 +47,7 @@ https://script.google.com/a/macros/ibex-ai.com/s/AKfycbzmoYfAQQEVFAvfXqv1ASx7DWo
 
 To edit a description, select **Show description**, select **Edit**, make the change, and select **Save description**. Editing is available only to signed-in users in the `ibex-ai.com` domain.
 
-### Step 5: Deploy the New Version (Crucial for Google Sites to see updates)
+### Step 5: Deploy the New Web App Version
 When you update code in Apps Script, you **must update the active deployment**:
 1. At the top right of the Apps Script editor, click **Deploy > Manage deployments**.
 2. Select your active Web app deployment from the list on the left.
@@ -55,7 +55,7 @@ When you update code in Apps Script, you **must update the active deployment**:
 4. Under **Version**, select **New version**.
 5. Click **Deploy**.
 
-*(Note: Because the deployment URL remains the exact same, Google Sites will immediately start serving the updated version with Dark Mode and Jira Links upon page refresh!)*
+*(Note: The deployment URL remains the same. The direct web app serves the new version after the deployment is updated. If the app is embedded elsewhere, refresh that host page after deploying.)*
 
 ---
 
