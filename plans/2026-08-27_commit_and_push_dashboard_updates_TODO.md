@@ -14,7 +14,7 @@ Record all currently pending changes in the Google Apps Script Jira releases rep
        Files: all files listed by `git status --short`
        Done when: a new local commit records the complete pending change set.
 
-- [ ] 3. Push the new commit to `origin/main` and verify the remote tracking state.
+- [x] 3. Push the new commit to `origin/main` and verify the remote tracking state.
        Files: Git repository history
        Done when: `origin/main` contains the new commit and the worktree is clean.
 
