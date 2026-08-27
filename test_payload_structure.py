@@ -6,6 +6,7 @@ Validates sorting, status categorization, null-handling, and schema compatibilit
 
 import json
 import sys
+from pathlib import Path
 
 # Simulated sample payload matching Jira Cloud /rest/api/3/project/{key}/versions
 SAMPLE_JIRA_VERSIONS = [
@@ -140,5 +141,25 @@ def test_transformation():
     print("✅ All transformation and sorting tests PASSED successfully!")
     print(json.dumps(processed, indent=2))
 
+
+def test_description_update_endpoint_contract():
+    """Verify that the Apps Script update endpoint retains its security contract."""
+    code = Path(__file__).with_name("Code.gs").read_text(encoding="utf-8")
+
+    assert "function apiUpdateReleaseDescription(versionId, description)" in code
+    assert "assertAuthorizedIbexUser();" in code
+    assert "AUTHORIZED_EMAIL_DOMAIN = 'ibex-ai.com'" in code
+    assert "/^\\d{1,20}$/.test(versionId)" in code
+    assert "description.length > MAX_DESCRIPTION_LENGTH" in code
+    assert "method: 'put'" in code
+    assert "'/rest/api/2/version/' + encodeURIComponent(versionId)" in code
+    assert "payload: JSON.stringify({ description: description })" in code
+    assert "CacheService.getScriptCache().remove(CACHE_KEY);" in code
+    assert "function getSafeJiraValidationMessage(response)" in code
+    assert "message.slice(0, 240)" in code
+
+    print("✅ Description update endpoint contract test passed.")
+
 if __name__ == "__main__":
     test_transformation()
+    test_description_update_endpoint_contract()

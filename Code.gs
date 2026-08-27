@@ -7,6 +7,8 @@
 // Configuration constants
 var CACHE_KEY = 'IBEX_JIRA_RELEASES_CACHE';
 var CACHE_EXPIRATION_SECONDS = 3600; // 1 hour
+var AUTHORIZED_EMAIL_DOMAIN = 'ibex-ai.com';
+var MAX_DESCRIPTION_LENGTH = 32767;
 
 /**
  * HTTP GET entry point for Google Apps Script Web App.
@@ -25,6 +27,90 @@ function doGet(e) {
  */
 function apiGetReleases(forceRefresh) {
   return getJiraReleases(!!forceRefresh);
+}
+
+/**
+ * Updates the description of one Jira release version.
+ * This function is callable from the dashboard only by signed-in Ibex users.
+ * @param {string} versionId Jira version ID.
+ * @param {string} description Replacement description, which may be empty.
+ * @returns {Object} Safe confirmation payload.
+ */
+function apiUpdateReleaseDescription(versionId, description) {
+  assertAuthorizedIbexUser();
+
+  if (typeof versionId !== 'string' || !/^\d{1,20}$/.test(versionId)) {
+    throw new Error('Invalid Jira release version ID.');
+  }
+
+  if (typeof description !== 'string' || description.length > MAX_DESCRIPTION_LENGTH) {
+    throw new Error('Description must be text no longer than ' + MAX_DESCRIPTION_LENGTH + ' characters.');
+  }
+
+  var scriptProps = PropertiesService.getScriptProperties();
+  var baseUrl = (scriptProps.getProperty('JIRA_BASE_URL') || 'https://ibex-ai.atlassian.net').replace(/\/+$/, '');
+  var userEmail = scriptProps.getProperty('JIRA_USER_EMAIL');
+  var apiToken = scriptProps.getProperty('JIRA_API_TOKEN');
+
+  if (!userEmail || !apiToken) {
+    throw new Error('Jira credentials are not configured.');
+  }
+
+  var response = UrlFetchApp.fetch(
+    baseUrl + '/rest/api/2/version/' + encodeURIComponent(versionId),
+    {
+      method: 'put',
+      contentType: 'application/json',
+      headers: {
+        'Authorization': 'Basic ' + Utilities.base64Encode(userEmail + ':' + apiToken),
+        'Accept': 'application/json'
+      },
+      payload: JSON.stringify({ description: description }),
+      muteHttpExceptions: true
+    }
+  );
+
+  if (response.getResponseCode() !== 200) {
+    throw new Error('Jira could not update the release description. HTTP ' + response.getResponseCode() + getSafeJiraValidationMessage(response) + '.');
+  }
+
+  CacheService.getScriptCache().remove(CACHE_KEY);
+  return { id: versionId, description: description };
+}
+
+/**
+ * Extracts a short Jira validation message without returning an unbounded response body.
+ */
+function getSafeJiraValidationMessage(response) {
+  var rawBody = response.getContentText() || '';
+  var message = '';
+
+  try {
+    var parsedBody = JSON.parse(rawBody);
+    if (parsedBody.errorMessages && parsedBody.errorMessages.length) {
+      message = parsedBody.errorMessages.join(' ');
+    } else if (parsedBody.errors) {
+      var fields = Object.keys(parsedBody.errors);
+      message = fields.map(function(field) {
+        return field + ': ' + parsedBody.errors[field];
+      }).join(' ');
+    }
+  } catch (e) {
+    message = '';
+  }
+
+  message = String(message).replace(/[\r\n\t]+/g, ' ').trim();
+  return message ? ' - ' + message.slice(0, 240) : '';
+}
+
+/**
+ * Ensures the active caller belongs to the permitted Workspace domain.
+ */
+function assertAuthorizedIbexUser() {
+  var activeEmail = (Session.getActiveUser().getEmail() || '').toLowerCase();
+  if (!activeEmail || activeEmail.slice(-(AUTHORIZED_EMAIL_DOMAIN.length + 1)) !== '@' + AUTHORIZED_EMAIL_DOMAIN) {
+    throw new Error('You must be signed in with an authorized Ibex account to edit release descriptions.');
+  }
 }
 
 /**

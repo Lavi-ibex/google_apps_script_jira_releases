@@ -353,6 +353,42 @@
       display: none;
     }
 
+    .release-description-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .description-heading {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .description-edit {
+      padding: 2px 4px;
+      border: 0;
+      background: transparent;
+      color: var(--primary-accent);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .description-edit:hover {
+      text-decoration: underline;
+    }
+
+    .description-edit:focus-visible {
+      outline: 2px solid var(--primary-accent);
+      outline-offset: 2px;
+    }
+
     .description-toggle {
       margin-top: 12px;
       padding: 6px 10px;
@@ -371,6 +407,44 @@
     }
 
     .description-toggle:focus-visible {
+      outline: 2px solid var(--primary-accent);
+      outline-offset: 2px;
+    }
+
+    .description-actions,
+    .description-editor-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .description-editor {
+      margin-top: 12px;
+      padding: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background: var(--bg-desc);
+    }
+
+    .description-editor[hidden] {
+      display: none;
+    }
+
+    .description-input {
+      width: 100%;
+      min-height: 140px;
+      padding: 10px;
+      border: 1px solid var(--btn-border);
+      border-radius: 5px;
+      background: var(--bg-card);
+      color: var(--text-main);
+      font: inherit;
+      line-height: 1.5;
+      resize: vertical;
+    }
+
+    .description-input:focus {
       outline: 2px solid var(--primary-accent);
       outline-offset: 2px;
     }
@@ -608,8 +682,27 @@
 
         if (r.description && r.description !== 'No description provided.') {
           var descriptionId = 'release-description-' + index;
-          html += '  <button type="button" class="description-toggle" aria-expanded="false" aria-controls="' + descriptionId + '" onclick="toggleDescription(this)">Show description</button>';
-          html += '  <div id="' + descriptionId + '" class="release-description" hidden>' + escapeHtml(r.description) + '</div>';
+          var editorId = 'release-description-editor-' + index;
+          var inputId = 'release-description-input-' + index;
+          html += '  <div class="description-actions">';
+          html += '    <button type="button" class="description-toggle" aria-expanded="false" aria-controls="' + descriptionId + '" data-editor-id="' + editorId + '" onclick="toggleDescription(this)">Show description</button>';
+          html += '  </div>';
+          html += '  <div id="' + descriptionId + '" class="release-description" hidden>';
+          html += '    <div class="release-description-header">';
+          html += '      <span class="description-heading">Description</span>';
+          html += '      <button type="button" class="description-edit" aria-expanded="false" aria-controls="' + editorId + '" onclick="showDescriptionEditor(this)">Edit</button>';
+          html += '    </div>';
+          html += '    <div class="release-description-content">' + escapeHtml(r.description) + '</div>';
+          html += '    <div id="' + editorId + '" class="description-editor" hidden>';
+          html += '      <label for="' + inputId + '">Release description</label>';
+          html += '      <textarea id="' + inputId + '" class="description-input" maxlength="32767">' + escapeHtml(r.description) + '</textarea>';
+          html += '      <div class="description-editor-actions">';
+          html += '        <button type="button" class="btn-action" data-version-id="' + escapeHtml(r.id || '') + '" data-input-id="' + inputId + '" data-editor-id="' + editorId + '" onclick="saveDescription(this)">Save description</button>';
+          html += '        <button type="button" class="btn-action" data-input-id="' + inputId + '" data-editor-id="' + editorId + '" onclick="cancelDescriptionEdit(this)">Cancel</button>';
+          html += '      </div>';
+          html += '    </div>';
+          html += '    </div>';
+          html += '  </div>';
         }
 
         html += '</div>';
@@ -629,6 +722,60 @@
       button.setAttribute('aria-expanded', expanded ? 'false' : 'true');
       button.textContent = expanded ? 'Show description' : 'Hide description';
       description.hidden = expanded;
+      if (expanded) {
+        var editor = document.getElementById(button.getAttribute('data-editor-id'));
+        if (editor) editor.hidden = true;
+      }
+    }
+
+    function showDescriptionEditor(button) {
+      var editor = document.getElementById(button.getAttribute('aria-controls'));
+      if (!editor) return;
+      editor.hidden = false;
+      button.setAttribute('aria-expanded', 'true');
+      editor.querySelector('textarea').focus();
+    }
+
+    function cancelDescriptionEdit(button) {
+      var editor = document.getElementById(button.getAttribute('data-editor-id'));
+      var input = document.getElementById(button.getAttribute('data-input-id'));
+      if (!editor || !input) return;
+      input.value = input.defaultValue;
+      editor.hidden = true;
+      var editButton = document.querySelector('[aria-controls="' + editor.id + '"]');
+      if (editButton) editButton.setAttribute('aria-expanded', 'false');
+    }
+
+    function saveDescription(button) {
+      var versionId = button.getAttribute('data-version-id');
+      var input = document.getElementById(button.getAttribute('data-input-id'));
+      var editor = document.getElementById(button.getAttribute('data-editor-id'));
+      if (!versionId || !input || !editor) {
+        showError('The release description editor is unavailable.');
+        return;
+      }
+
+      if (typeof google === 'undefined' || !google.script || !google.script.run) {
+        showError('Saving descriptions is available only in the deployed dashboard.');
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = 'Saving...';
+      hideError();
+      google.script.run
+        .withSuccessHandler(function() {
+          editor.hidden = true;
+          button.disabled = false;
+          button.textContent = 'Save description';
+          fetchReleases(true);
+        })
+        .withFailureHandler(function(err) {
+          button.disabled = false;
+          button.textContent = 'Save description';
+          showError(err && err.message ? err.message : 'Could not save the release description.');
+        })
+        .apiUpdateReleaseDescription(versionId, input.value);
     }
 
     function showError(msg) {

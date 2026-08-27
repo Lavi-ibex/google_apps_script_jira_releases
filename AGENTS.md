@@ -37,3 +37,8 @@ Update the Python test alongside intentional changes to the transformation contr
 ## Deployment
 
 Source edits do not update the live Google Sites widget automatically. Deploy a new version of the existing Apps Script web app after validating changes.
+
+## Local Planning Files
+
+- Store task plans in `plans/` using the dated `YYYY-MM-DD_plan_name_TODO.md` naming convention.
+- `plans/` is local-only documentation. It must remain ignored by Git and must not be committed.
