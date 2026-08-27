@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ibex Jira Releases</title>
+  <style>
+    :root {
+      --bg-primary: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-card-hover: #ffffff;
+      --bg-desc: #f1f5f9;
+      --border-color: #e2e8f0;
+      --border-hover: #cbd5e1;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --primary-accent: #0284c7;
+      
+      --btn-bg: #ffffff;
+      --btn-hover: #f1f5f9;
+      --btn-border: #cbd5e1;
+      
+      --badge-released-bg: #dcfce7;
+      --badge-released-text: #15803d;
+      --badge-unreleased-bg: #e0f2fe;
+      --badge-unreleased-text: #0369a1;
+      --badge-overdue-bg: #fee2e2;
+      --badge-overdue-text: #b91c1c;
+      --badge-archived-bg: #f1f5f9;
+      --badge-archived-text: #64748b;
+
+      --date-badge-bg: #f8fafc;
+      --date-badge-border: #cbd5e1;
+      --date-badge-text: #0f172a;
+
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #0b1120;
+      --bg-card: #1e293b;
+      --bg-card-hover: #24344d;
+      --bg-desc: #0f172a;
+      --border-color: #334155;
+      --border-hover: #475569;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary-accent: #38bdf8;
+      
+      --btn-bg: #1e293b;
+      --btn-hover: #334155;
+      --btn-border: #475569;
+      
+      --badge-released-bg: #064e3b;
+      --badge-released-text: #6ee7b7;
+      --badge-unreleased-bg: #0c4a6e;
+      --badge-unreleased-text: #7dd3fc;
+      --badge-overdue-bg: #7f1d1d;
+      --badge-overdue-text: #fca5a5;
+      --badge-archived-bg: #334155;
+      --badge-archived-text: #cbd5e1;
+
+      --date-badge-bg: #0f172a;
+      --date-badge-border: #334155;
+      --date-badge-text: #f8fafc;
+
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      padding: 24px;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .header-title h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .header-title p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-action {
+      background-color: var(--btn-bg);
+      border: 1px solid var(--btn-border);
+      color: var(--text-main);
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-action:hover {
+      background-color: var(--btn-hover);
+      border-color: var(--border-hover);
+    }
+
+    .btn-action:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .icon-svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Summary KPI Bar */
+    .summary-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .summary-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 14px 18px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .summary-card .label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .summary-card .value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-top: 4px;
+      color: var(--text-main);
+    }
+
+    /* Release Cards Table */
+    .releases-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .release-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 20px 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .release-card:hover {
+      background: var(--bg-card-hover);
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-hover);
+    }
+
+    .release-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .release-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .release-link {
+      color: var(--text-main);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.15s ease;
+    }
+
+    .release-link:hover {
+      color: var(--primary-accent);
+      text-decoration: underline;
+    }
+
+    .link-icon {
+      width: 15px;
+      height: 15px;
+      opacity: 0.6;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+    }
+
+    .release-link:hover .link-icon {
+      opacity: 1;
+      transform: translate(1px, -1px);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      flex-shrink: 0;
+    }
+
+    .badge-released {
+      background-color: var(--badge-released-bg);
+      color: var(--badge-released-text);
+    }
+
+    .badge-unreleased {
+      background-color: var(--badge-unreleased-bg);
+      color: var(--badge-unreleased-text);
+    }
+
+    .badge-overdue {
+      background-color: var(--badge-overdue-bg);
+      color: var(--badge-overdue-text);
+    }
+
+    .badge-archived {
+      background-color: var(--badge-archived-bg);
+      color: var(--badge-archived-text);
+    }
+
+    /* Distinctive Release Date Badge */
+    .release-date-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background-color: var(--date-badge-bg);
+      border: 1px solid var(--date-badge-border);
+      color: var(--date-badge-text);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    .date-icon {
+      width: 15px;
+      height: 15px;
+      color: var(--primary-accent);
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
+    .date-label {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .date-val {
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .release-description {
+      font-size: 0.9rem;
+      color: var(--text-main);
+      background: var(--bg-desc);
+      padding: 12px 16px;
+      border-radius: 6px;
+      border-left: 3px solid var(--primary-accent);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      border-radius: 8px;
+      border: 1px dashed var(--border-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .alert-error {
+      background-color: #fee2e2;
+      border: 1px solid #f87171;
+      color: #991b1b;
+      padding: 14px 18px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+    }
+
+    [data-theme="dark"] .alert-error {
+      background-color: #450a0a;
+      border-color: #991b1b;
+      color: #fca5a5;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(125, 125, 125, 0.3);
+      border-radius: 50%;
+      border-top-color: currentColor;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="header-title">
+        <h1>Ibex Jira Releases</h1>
+        <p id="sub-header">Live releases tracked from Jira Cloud</p>
+      </div>
+      <div class="header-actions">
+        <!-- Theme Toggle Button -->
+        <button id="btn-theme" class="btn-action" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+          <span id="theme-icon">
+            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          </span>
+          <span id="theme-label">Dark Mode</span>
+        </button>
+
+        <!-- Refresh Button -->
+        <button id="btn-refresh" class="btn-action" onclick="fetchReleases(true)">
+          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+          Refresh
+        </button>
+      </div>
+    </div>
+
+    <!-- Error Banner -->
+    <div id="error-container" style="display: none;"></div>
+
+    <!-- Summary KPIs -->
+    <div class="summary-bar">
+      <div class="summary-card">
+        <div class="label">Upcoming / Active</div>
+        <div class="value" id="kpi-unreleased">-</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Released</div>
+        <div class="value" id="kpi-released">-</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Archived</div>
+        <div class="value" id="kpi-archived">-</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Total Versions</div>
+        <div class="value" id="kpi-total">-</div>
+      </div>
+    </div>
+
+    <!-- Releases Card List -->
+    <div id="releases-container" class="releases-list">
+      <div class="empty-state">
+        <span class="spinner"></span>
+        <span>Loading releases from Jira...</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var currentReleases = [];
+
+    // --- Theme Management ---
+    function initTheme() {
+      var savedTheme = localStorage.getItem('ibex_jira_theme');
+      if (!savedTheme) {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          savedTheme = 'dark';
+        } else {
+          savedTheme = 'light';
+        }
+      }
+      applyTheme(savedTheme);
+    }
+
+    function toggleTheme() {
+      var current = document.documentElement.getAttribute('data-theme') || 'light';
+      var next = current === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+      localStorage.setItem('ibex_jira_theme', next);
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      var iconContainer = document.getElementById('theme-icon');
+      var label = document.getElementById('theme-label');
+
+      if (theme === 'dark') {
+        iconContainer.innerHTML = '<svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+        label.textContent = 'Light Mode';
+      } else {
+        iconContainer.innerHTML = '<svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+        label.textContent = 'Dark Mode';
+      }
+    }
+
+    // --- Data Fetching ---
+    function fetchReleases(forceRefresh) {
+      var btn = document.getElementById('btn-refresh');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Refreshing...';
+      hideError();
+
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(releases) {
+            btn.disabled = false;
+            btn.innerHTML = '<svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg> Refresh';
+            currentReleases = releases || [];
+            renderReleases(currentReleases);
+          })
+          .withFailureHandler(function(err) {
+            btn.disabled = false;
+            btn.innerHTML = '<svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg> Refresh';
+            showError(err.message || err);
+          })
+          .apiGetReleases(forceRefresh);
+      } else {
+        // Fallback for local preview testing
+        setTimeout(function() {
+          btn.disabled = false;
+          btn.innerHTML = '<svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg> Refresh';
+        }, 800);
+      }
+    }
+
+    function renderReleases(releases) {
+      var container = document.getElementById('releases-container');
+      
+      var countUnreleased = 0;
+      var countReleased = 0;
+      var countArchived = 0;
+
+      if (!releases || releases.length === 0) {
+        container.innerHTML = '<div class="empty-state">No releases found for this Jira project.</div>';
+        document.getElementById('kpi-unreleased').textContent = '0';
+        document.getElementById('kpi-released').textContent = '0';
+        document.getElementById('kpi-archived').textContent = '0';
+        document.getElementById('kpi-total').textContent = '0';
+        return;
+      }
+
+      var html = '';
+      releases.forEach(function(r) {
+        if (r.archived) countArchived++;
+        else if (r.released) countReleased++;
+        else countUnreleased++;
+
+        var badgeClass = 'badge-unreleased';
+        var dateLabel = 'Target Release';
+        if (r.statusCategory === 'released') {
+          badgeClass = 'badge-released';
+          dateLabel = 'Released on';
+        } else if (r.statusCategory === 'overdue') {
+          badgeClass = 'badge-overdue';
+          dateLabel = 'Target Release (Overdue)';
+        } else if (r.statusCategory === 'archived') {
+          badgeClass = 'badge-archived';
+          dateLabel = 'Archived Release';
+        }
+
+        // Construct release name with external Jira link
+        var releaseNameHtml = '';
+        var safeName = escapeHtml(r.name);
+        if (r.url) {
+          releaseNameHtml = '<a href="' + escapeHtml(r.url) + '" target="_blank" rel="noopener noreferrer" class="release-link" title="Open in Jira">' +
+            safeName +
+            '<svg class="link-icon" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>' +
+            '</a>';
+        } else {
+          releaseNameHtml = safeName;
+        }
+
+        html += '<div class="release-card">';
+        html += '  <div class="release-header">';
+        html += '    <div class="release-name">' + releaseNameHtml + '</div>';
+        html += '    <span class="badge ' + badgeClass + '">' + escapeHtml(r.status) + '</span>';
+        html += '  </div>';
+        
+        // Distinctive Date Badge
+        html += '  <div class="release-date-badge">';
+        html += '    <svg class="date-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>';
+        html += '    <span class="date-label">' + escapeHtml(dateLabel) + ':</span>';
+        html += '    <span class="date-val">' + escapeHtml(r.userReleaseDate || 'No date set') + '</span>';
+        html += '  </div>';
+
+        if (r.description && r.description !== 'No description provided.') {
+          html += '  <div class="release-description">' + escapeHtml(r.description) + '</div>';
+        }
+
+        html += '</div>';
+      });
+
+      container.innerHTML = html;
+      document.getElementById('kpi-unreleased').textContent = countUnreleased;
+      document.getElementById('kpi-released').textContent = countReleased;
+      document.getElementById('kpi-archived').textContent = countArchived;
+      document.getElementById('kpi-total').textContent = releases.length;
+    }
+
+    function showError(msg) {
+      var container = document.getElementById('error-container');
+      container.className = 'alert-error';
+      container.textContent = 'Error: ' + msg;
+      container.style.display = 'block';
+    }
+
+    function hideError() {
+      var container = document.getElementById('error-container');
+      container.style.display = 'none';
+      container.textContent = '';
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    window.onload = function() {
+      initTheme();
+      fetchReleases(false);
+    };
+  </script>
+</body>
+</html>
