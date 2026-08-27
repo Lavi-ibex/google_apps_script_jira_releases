@@ -97,8 +97,23 @@
       flex-wrap: wrap;
       gap: 16px;
       margin-bottom: 24px;
+      padding-top: 56px;
       padding-bottom: 16px;
       border-bottom: 1px solid var(--border-color);
+      position: relative;
+    }
+
+    .header-brand {
+      display: contents;
+    }
+
+    .ibex-logo {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 129px;
+      height: auto;
+      transform: translateX(-50%);
     }
 
     .header-title h1 {
@@ -334,6 +349,32 @@
       word-break: break-word;
     }
 
+    .release-description[hidden] {
+      display: none;
+    }
+
+    .description-toggle {
+      margin-top: 12px;
+      padding: 6px 10px;
+      border: 1px solid var(--btn-border);
+      border-radius: 5px;
+      background: var(--btn-bg);
+      color: var(--text-main);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .description-toggle:hover {
+      background: var(--btn-hover);
+    }
+
+    .description-toggle:focus-visible {
+      outline: 2px solid var(--primary-accent);
+      outline-offset: 2px;
+    }
+
     .empty-state {
       text-align: center;
       padding: 48px 24px;
@@ -383,8 +424,11 @@
   <div class="container">
     <div class="header">
       <div class="header-title">
-        <h1>Ibex Jira Releases</h1>
-        <p id="sub-header">Live releases tracked from Jira Cloud</p>
+        <div class="header-brand">
+          <img class="ibex-logo" src="data:image/png;base64,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" alt="Ibex">
+          <h1>Ibex Jira Releases</h1>
+        </div>
+        <p id="sub-header">Live releases tracked from Jira Cloud - powered by Google Apps Script</p>
       </div>
       <div class="header-actions">
         <!-- Theme Toggle Button -->
@@ -413,7 +457,7 @@
         <div class="value" id="kpi-unreleased">-</div>
       </div>
       <div class="summary-card">
-        <div class="label">Released</div>
+        <div class="label">Released in 2026</div>
         <div class="value" id="kpi-released">-</div>
       </div>
       <div class="summary-card">
@@ -519,7 +563,7 @@
       }
 
       var html = '';
-      releases.forEach(function(r) {
+      releases.forEach(function(r, index) {
         if (r.archived) countArchived++;
         else if (r.released) countReleased++;
         else countUnreleased++;
@@ -563,7 +607,9 @@
         html += '  </div>';
 
         if (r.description && r.description !== 'No description provided.') {
-          html += '  <div class="release-description">' + escapeHtml(r.description) + '</div>';
+          var descriptionId = 'release-description-' + index;
+          html += '  <button type="button" class="description-toggle" aria-expanded="false" aria-controls="' + descriptionId + '" onclick="toggleDescription(this)">Show description</button>';
+          html += '  <div id="' + descriptionId + '" class="release-description" hidden>' + escapeHtml(r.description) + '</div>';
         }
 
         html += '</div>';
@@ -574,6 +620,15 @@
       document.getElementById('kpi-released').textContent = countReleased;
       document.getElementById('kpi-archived').textContent = countArchived;
       document.getElementById('kpi-total').textContent = releases.length;
+    }
+
+    function toggleDescription(button) {
+      var description = document.getElementById(button.getAttribute('aria-controls'));
+      var expanded = button.getAttribute('aria-expanded') === 'true';
+      if (!description) return;
+      button.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+      button.textContent = expanded ? 'Show description' : 'Hide description';
+      description.hidden = expanded;
     }
 
     function showError(msg) {

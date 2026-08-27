@@ -100,7 +100,16 @@ function processRawVersions(rawVersions, baseUrl, projectKey) {
   baseUrl = (baseUrl || 'https://ibex-ai.atlassian.net').replace(/\/+$/, '');
   projectKey = projectKey || 'IBX';
 
-  var formatted = rawVersions.map(function(v) {
+  // Show dated active versions and versions released during calendar year 2026.
+  var visibleVersions = rawVersions.filter(function(v) {
+    if (!v || v.archived || typeof v.releaseDate !== 'string' || v.releaseDate.trim() === '') {
+      return false;
+    }
+
+    return !v.released || v.releaseDate.indexOf('2026-') === 0;
+  });
+
+  var formatted = visibleVersions.map(function(v) {
     var status = 'Unreleased';
     var statusCategory = 'unreleased';
 

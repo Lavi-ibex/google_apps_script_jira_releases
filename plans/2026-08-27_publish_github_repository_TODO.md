@@ -9,11 +9,11 @@ Publish the existing Google Apps Script Jira Releases dashboard as the public Gi
        Files: `.gitignore`
        Done when: source files are included while local Apps Script configuration and common secret files are excluded.
 
-- [ ] 2. Initialize this directory as a Git repository and create its first local commit.
+- [x] 2. Initialize this directory as a Git repository and create its first local commit.
        Files: `.git/`, all tracked project files
        Done when: Git reports an initial commit containing only the intended project files.
 
-- [ ] 3. Create the public GitHub repository and push the initial commit.
+- [x] 3. Create the public GitHub repository and push the initial commit.
        Files: GitHub repository `Lavi-ibex/google_apps_script_jira_releases`
        Done when: the remote repository exists publicly and its default branch contains the initial commit.
 

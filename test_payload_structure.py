@@ -53,6 +53,15 @@ SAMPLE_JIRA_VERSIONS = [
         "userReleaseDate": "01/Aug/2026",
         "projectId": 10000,
         "description": "Critical security and stability patches."
+    },
+    {
+        "self": "https://ibex-ai.atlassian.net/rest/api/3/version/10005",
+        "id": "10005",
+        "name": "Undated Draft Version",
+        "archived": False,
+        "released": False,
+        "releaseDate": "   ",
+        "projectId": 10000
     }
 ]
 
@@ -60,6 +69,15 @@ def process_raw_versions(raw_versions):
     """Python port of the Apps Script transformation logic for testing"""
     formatted = []
     for v in raw_versions:
+        release_date = v.get("releaseDate")
+        if (
+            v.get("archived")
+            or not isinstance(release_date, str)
+            or not release_date.strip()
+            or (v.get("released") and not release_date.startswith("2026-"))
+        ):
+            continue
+
         status = "Unreleased"
         status_category = "unreleased"
 
@@ -81,7 +99,7 @@ def process_raw_versions(raw_versions):
             "released": bool(v.get("released")),
             "archived": bool(v.get("archived")),
             "overdue": bool(v.get("overdue")),
-            "releaseDate": v.get("releaseDate", ""),
+            "releaseDate": release_date,
             "userReleaseDate": v.get("userReleaseDate") or v.get("releaseDate") or "No date set",
             "description": v.get("description") or "No description provided."
         })
@@ -103,21 +121,21 @@ def test_transformation():
     print("Testing transformation logic...")
     processed = process_raw_versions(SAMPLE_JIRA_VERSIONS)
     
-    assert len(processed) == 4, f"Expected 4 items, got {len(processed)}"
+    assert len(processed) == 3, f"Expected 3 visible items, got {len(processed)}"
+    assert all(item["releaseDate"].strip() for item in processed)
+    assert all(not item["archived"] for item in processed)
+    assert all(
+        not item["released"] or item["releaseDate"].startswith("2026-")
+        for item in processed
+    )
+    assert all(item["name"] not in {"Ibex v3.9 (Legacy)", "Undated Draft Version"} for item in processed)
     
-    # Check ordering: Overdue (4.1.5) -> Unreleased (4.2.0) -> Released (4.1.0) -> Archived (3.9)
-    assert processed[0]["name"] == "Ibex v4.1.5 (Hotfix)", f"Unexpected 1st item: {processed[0]['name']}"
+    assert processed[0]["name"] == "Ibex v4.1.5 (Hotfix)"
     assert processed[0]["status"] == "Overdue"
-    
-    assert processed[1]["name"] == "Ibex v4.2.0", f"Unexpected 2nd item: {processed[1]['name']}"
+    assert processed[1]["name"] == "Ibex v4.2.0"
     assert processed[1]["status"] == "Unreleased"
-    
-    assert processed[2]["name"] == "Ibex v4.1.0", f"Unexpected 3rd item: {processed[2]['name']}"
+    assert processed[2]["name"] == "Ibex v4.1.0"
     assert processed[2]["status"] == "Released"
-    
-    assert processed[3]["name"] == "Ibex v3.9 (Legacy)", f"Unexpected 4th item: {processed[3]['name']}"
-    assert processed[3]["status"] == "Archived"
-    assert processed[3]["description"] == "No description provided."
 
     print("✅ All transformation and sorting tests PASSED successfully!")
     print(json.dumps(processed, indent=2))
