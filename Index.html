@@ -82,11 +82,12 @@
       color: var(--text-main);
       padding: 24px;
       line-height: 1.5;
+      font-size: 1.06rem;
       min-height: 100vh;
     }
 
     .container {
-      max-width: 1100px;
+      max-width: 1400px;
       margin: 0 auto;
     }
 
@@ -117,13 +118,13 @@
     }
 
     .header-title h1 {
-      font-size: 1.6rem;
+      font-size: 1.8rem;
       font-weight: 700;
       color: var(--text-main);
     }
 
     .header-title p {
-      font-size: 0.875rem;
+      font-size: 0.98rem;
       color: var(--text-muted);
       margin-top: 4px;
     }
@@ -131,6 +132,7 @@
     .header-actions {
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
       gap: 10px;
     }
 
@@ -138,8 +140,8 @@
       background-color: var(--btn-bg);
       border: 1px solid var(--btn-border);
       color: var(--text-main);
-      padding: 8px 14px;
-      font-size: 0.85rem;
+      padding: 9px 16px;
+      font-size: 0.94rem;
       font-weight: 600;
       border-radius: 6px;
       cursor: pointer;
@@ -181,12 +183,12 @@
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 8px;
-      padding: 14px 18px;
+      padding: 16px 20px;
       box-shadow: var(--shadow-sm);
     }
 
     .summary-card .label {
-      font-size: 0.75rem;
+      font-size: 0.82rem;
       text-transform: uppercase;
       font-weight: 700;
       letter-spacing: 0.05em;
@@ -194,7 +196,7 @@
     }
 
     .summary-card .value {
-      font-size: 1.5rem;
+      font-size: 1.7rem;
       font-weight: 700;
       margin-top: 4px;
       color: var(--text-main);
@@ -211,7 +213,7 @@
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 8px;
-      padding: 20px 24px;
+      padding: 22px 26px;
       box-shadow: var(--shadow-sm);
     }
 
@@ -230,7 +232,7 @@
     }
 
     .release-name {
-      font-size: 1.25rem;
+      font-size: 1.4rem;
       font-weight: 700;
       color: var(--text-main);
     }
@@ -270,7 +272,7 @@
     .badge {
       display: inline-block;
       padding: 4px 12px;
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       font-weight: 700;
       border-radius: 9999px;
       text-transform: uppercase;
@@ -306,9 +308,9 @@
       background-color: var(--date-badge-bg);
       border: 1px solid var(--date-badge-border);
       color: var(--date-badge-text);
-      padding: 6px 14px;
+      padding: 7px 15px;
       border-radius: 6px;
-      font-size: 0.85rem;
+      font-size: 0.94rem;
       margin-bottom: 14px;
       box-shadow: 0 1px 2px rgba(0,0,0,0.02);
     }
@@ -327,7 +329,7 @@
 
     .date-label {
       color: var(--text-muted);
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -338,8 +340,64 @@
       color: var(--text-main);
     }
 
+    .date-edit {
+      padding: 2px 4px;
+      border: 0;
+      background: transparent;
+      color: var(--primary-accent);
+      font: inherit;
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .date-edit:hover {
+      text-decoration: underline;
+    }
+
+    .date-edit:focus-visible {
+      outline: 2px solid var(--primary-accent);
+      outline-offset: 2px;
+    }
+
+    .date-editor {
+      max-width: 330px;
+      margin: -2px 0 14px;
+      padding: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background: var(--bg-desc);
+    }
+
+    .date-editor[hidden] {
+      display: none;
+    }
+
+    .date-editor label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--text-main);
+      font-size: 0.94rem;
+      font-weight: 700;
+    }
+
+    .date-input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--btn-border);
+      border-radius: 5px;
+      background: var(--bg-card);
+      color: var(--text-main);
+      font: inherit;
+    }
+
+    .date-input:focus {
+      outline: 2px solid var(--primary-accent);
+      outline-offset: 2px;
+    }
+
     .release-description {
-      font-size: 0.9rem;
+      font-size: 1rem;
       color: var(--text-main);
       background: var(--bg-desc);
       padding: 12px 16px;
@@ -363,7 +421,7 @@
 
     .description-heading {
       color: var(--text-muted);
-      font-size: 0.75rem;
+      font-size: 0.82rem;
       font-weight: 700;
       letter-spacing: 0.05em;
       text-transform: uppercase;
@@ -375,7 +433,7 @@
       background: transparent;
       color: var(--primary-accent);
       font: inherit;
-      font-size: 0.8rem;
+      font-size: 0.86rem;
       font-weight: 700;
       cursor: pointer;
     }
@@ -391,13 +449,13 @@
 
     .description-toggle {
       margin-top: 12px;
-      padding: 6px 10px;
+      padding: 7px 12px;
       border: 1px solid var(--btn-border);
       border-radius: 5px;
       background: var(--btn-bg);
       color: var(--text-main);
       font: inherit;
-      font-size: 0.8rem;
+      font-size: 0.86rem;
       font-weight: 700;
       cursor: pointer;
     }
@@ -411,6 +469,7 @@
       outline-offset: 2px;
     }
 
+    .date-editor-actions,
     .description-actions,
     .description-editor-actions {
       display: flex;
@@ -492,6 +551,31 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
+
+    @media (max-width: 760px) {
+      body {
+        padding: 16px;
+      }
+
+      .header {
+        align-items: flex-start;
+        padding-top: 52px;
+      }
+
+      .header-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .release-header,
+      .release-date-badge {
+        flex-wrap: wrap;
+      }
+
+      .release-card {
+        padding: 18px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -505,6 +589,10 @@
         <p id="sub-header">Live releases tracked from Jira Cloud - powered by Google Apps Script</p>
       </div>
       <div class="header-actions">
+        <button id="btn-toggle-all-descriptions" class="btn-action" type="button" aria-pressed="false" onclick="toggleAllDescriptions()">
+          Show all descriptions
+        </button>
+
         <!-- Theme Toggle Button -->
         <button id="btn-theme" class="btn-action" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
           <span id="theme-icon">
@@ -622,6 +710,7 @@
         container.innerHTML = '<div class="empty-state">No releases found for this Jira project.</div>';
         document.getElementById('kpi-unreleased').textContent = '0';
         document.getElementById('kpi-released').textContent = '0';
+        updateGlobalDescriptionToggle();
         return;
       }
 
@@ -662,10 +751,21 @@
         html += '  </div>';
         
         // Distinctive Date Badge
+        var dateEditorId = 'release-date-editor-' + index;
+        var dateInputId = 'release-date-input-' + index;
         html += '  <div class="release-date-badge">';
         html += '    <svg class="date-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>';
         html += '    <span class="date-label">' + escapeHtml(dateLabel) + ':</span>';
         html += '    <span class="date-val">' + escapeHtml(r.userReleaseDate || 'No date set') + '</span>';
+        html += '    <button type="button" class="date-edit" aria-expanded="false" aria-controls="' + dateEditorId + '" onclick="showDateEditor(this)">Edit</button>';
+        html += '  </div>';
+        html += '  <div id="' + dateEditorId + '" class="date-editor" hidden>';
+        html += '    <label for="' + dateInputId + '">Release date</label>';
+        html += '    <input id="' + dateInputId + '" class="date-input" type="date" required value="' + escapeHtml(r.releaseDate || '') + '">';
+        html += '    <div class="date-editor-actions">';
+        html += '      <button type="button" class="btn-action" data-version-id="' + escapeHtml(r.id || '') + '" data-input-id="' + dateInputId + '" data-editor-id="' + dateEditorId + '" onclick="saveReleaseDate(this)">Save date</button>';
+        html += '      <button type="button" class="btn-action" data-input-id="' + dateInputId + '" data-editor-id="' + dateEditorId + '" onclick="cancelDateEdit(this)">Cancel</button>';
+        html += '    </div>';
         html += '  </div>';
 
         if (r.description && r.description !== 'No description provided.') {
@@ -699,19 +799,105 @@
       container.innerHTML = html;
       document.getElementById('kpi-unreleased').textContent = countUnreleased;
       document.getElementById('kpi-released').textContent = countReleased;
+      updateGlobalDescriptionToggle();
     }
 
     function toggleDescription(button) {
-      var description = document.getElementById(button.getAttribute('aria-controls'));
       var expanded = button.getAttribute('aria-expanded') === 'true';
+      setDescriptionExpanded(button, !expanded);
+      updateGlobalDescriptionToggle();
+    }
+
+    function setDescriptionExpanded(button, expanded) {
+      var description = document.getElementById(button.getAttribute('aria-controls'));
       if (!description) return;
-      button.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-      button.textContent = expanded ? 'Show description' : 'Hide description';
-      description.hidden = expanded;
-      if (expanded) {
+      button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+      button.textContent = expanded ? 'Hide description' : 'Show description';
+      description.hidden = !expanded;
+      if (!expanded) {
         var editor = document.getElementById(button.getAttribute('data-editor-id'));
         if (editor) editor.hidden = true;
       }
+    }
+
+    function toggleAllDescriptions() {
+      var buttons = document.querySelectorAll('.description-toggle');
+      var shouldExpand = Array.prototype.some.call(buttons, function(button) {
+        return button.getAttribute('aria-expanded') !== 'true';
+      });
+
+      Array.prototype.forEach.call(buttons, function(button) {
+        setDescriptionExpanded(button, shouldExpand);
+      });
+      updateGlobalDescriptionToggle();
+    }
+
+    function updateGlobalDescriptionToggle() {
+      var globalButton = document.getElementById('btn-toggle-all-descriptions');
+      var buttons = document.querySelectorAll('.description-toggle');
+      var allExpanded = buttons.length > 0 && Array.prototype.every.call(buttons, function(button) {
+        return button.getAttribute('aria-expanded') === 'true';
+      });
+
+      globalButton.disabled = buttons.length === 0;
+      globalButton.setAttribute('aria-pressed', allExpanded ? 'true' : 'false');
+      globalButton.textContent = allExpanded ? 'Hide all descriptions' : 'Show all descriptions';
+    }
+
+    function showDateEditor(button) {
+      var editor = document.getElementById(button.getAttribute('aria-controls'));
+      if (!editor) return;
+      editor.hidden = false;
+      button.setAttribute('aria-expanded', 'true');
+      editor.querySelector('input[type="date"]').focus();
+    }
+
+    function cancelDateEdit(button) {
+      var editor = document.getElementById(button.getAttribute('data-editor-id'));
+      var input = document.getElementById(button.getAttribute('data-input-id'));
+      if (!editor || !input) return;
+      input.value = input.defaultValue;
+      editor.hidden = true;
+      var editButton = document.querySelector('[aria-controls="' + editor.id + '"]');
+      if (editButton) editButton.setAttribute('aria-expanded', 'false');
+    }
+
+    function saveReleaseDate(button) {
+      var versionId = button.getAttribute('data-version-id');
+      var input = document.getElementById(button.getAttribute('data-input-id'));
+      var editor = document.getElementById(button.getAttribute('data-editor-id'));
+      if (!versionId || !input || !editor) {
+        showError('The release date editor is unavailable.');
+        return;
+      }
+
+      if (!input.value) {
+        showError('Select a release date before saving.');
+        input.focus();
+        return;
+      }
+
+      if (typeof google === 'undefined' || !google.script || !google.script.run) {
+        showError('Saving release dates is available only in the deployed dashboard.');
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = 'Saving...';
+      hideError();
+      google.script.run
+        .withSuccessHandler(function() {
+          editor.hidden = true;
+          button.disabled = false;
+          button.textContent = 'Save date';
+          fetchReleases(true);
+        })
+        .withFailureHandler(function(err) {
+          button.disabled = false;
+          button.textContent = 'Save date';
+          showError(err && err.message ? err.message : 'Could not save the release date.');
+        })
+        .apiUpdateReleaseDate(versionId, input.value);
     }
 
     function showDescriptionEditor(button) {

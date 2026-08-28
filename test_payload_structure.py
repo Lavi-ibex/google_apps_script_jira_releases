@@ -160,6 +160,44 @@ def test_description_update_endpoint_contract():
 
     print("✅ Description update endpoint contract test passed.")
 
+
+def test_release_date_update_endpoint_contract():
+    """Verify that release-date updates validate dates and refresh cached data."""
+    code = Path(__file__).with_name("Code.gs").read_text(encoding="utf-8")
+
+    assert "function apiUpdateReleaseDate(versionId, releaseDate)" in code
+    assert "assertAuthorizedIbexUser();" in code
+    assert "if (!isValidIsoDate(releaseDate))" in code
+    assert "function isValidIsoDate(value)" in code
+    assert "/^\\d{4}-\\d{2}-\\d{2}$/.test(value)" in code
+    assert "Date.UTC(year, month - 1, day)" in code
+    assert "payload: JSON.stringify({ releaseDate: releaseDate })" in code
+    assert "Jira could not update the release date" in code
+    assert "return { id: versionId, releaseDate: releaseDate };" in code
+    assert code.count("CacheService.getScriptCache().remove(CACHE_KEY);") >= 2
+
+    print("✅ Release date update endpoint contract test passed.")
+
+
+def test_global_description_toggle_contract():
+    """Verify that the client keeps bulk and individual description controls synchronized."""
+    index_html = Path(__file__).with_name("Index.html").read_text(encoding="utf-8")
+
+    assert 'id="btn-toggle-all-descriptions"' in index_html
+    assert 'onclick="toggleAllDescriptions()"' in index_html
+    assert index_html.index('id="btn-toggle-all-descriptions"') < index_html.index('id="btn-theme"')
+    assert "function toggleAllDescriptions()" in index_html
+    assert "function updateGlobalDescriptionToggle()" in index_html
+    assert "function setDescriptionExpanded(button, expanded)" in index_html
+    assert "setDescriptionExpanded(button, shouldExpand);" in index_html
+    assert "globalButton.textContent = allExpanded ? 'Hide all descriptions' : 'Show all descriptions';" in index_html
+    assert index_html.count("updateGlobalDescriptionToggle();") >= 3
+
+    print("✅ Global description toggle client contract test passed.")
+
+
 if __name__ == "__main__":
     test_transformation()
     test_description_update_endpoint_contract()
+    test_release_date_update_endpoint_contract()
+    test_global_description_toggle_contract()

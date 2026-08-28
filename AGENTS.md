@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This project is a Google Apps Script web app that displays Jira release versions in a Google Sites embed.
+This project is a direct Google Apps Script web app that displays Jira release versions. It can also be embedded in Google Sites when needed.
 
 ## Project Structure
 
@@ -36,7 +36,7 @@ Update the Python test alongside intentional changes to the transformation contr
 
 ## Deployment
 
-Source edits do not update the live Google Sites widget automatically. Deploy a new version of the existing Apps Script web app after validating changes.
+Source edits do not update the live web app automatically. Deploy a new version of the existing Apps Script web app after validating changes. If the app is embedded in Google Sites, refresh the host page after deployment.
 
 ## Local Planning Files
 

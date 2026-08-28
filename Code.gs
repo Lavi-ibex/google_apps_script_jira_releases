@@ -79,6 +79,74 @@ function apiUpdateReleaseDescription(versionId, description) {
 }
 
 /**
+ * Updates the release date of one Jira release version.
+ * This function is callable from the dashboard only by signed-in Ibex users.
+ * @param {string} versionId Jira version ID.
+ * @param {string} releaseDate Required replacement date in YYYY-MM-DD format.
+ * @returns {Object} Safe confirmation payload.
+ */
+function apiUpdateReleaseDate(versionId, releaseDate) {
+  assertAuthorizedIbexUser();
+
+  if (typeof versionId !== 'string' || !/^\d{1,20}$/.test(versionId)) {
+    throw new Error('Invalid Jira release version ID.');
+  }
+
+  if (!isValidIsoDate(releaseDate)) {
+    throw new Error('Release date must be a valid date in YYYY-MM-DD format.');
+  }
+
+  var scriptProps = PropertiesService.getScriptProperties();
+  var baseUrl = (scriptProps.getProperty('JIRA_BASE_URL') || 'https://ibex-ai.atlassian.net').replace(/\/+$/, '');
+  var userEmail = scriptProps.getProperty('JIRA_USER_EMAIL');
+  var apiToken = scriptProps.getProperty('JIRA_API_TOKEN');
+
+  if (!userEmail || !apiToken) {
+    throw new Error('Jira credentials are not configured.');
+  }
+
+  var response = UrlFetchApp.fetch(
+    baseUrl + '/rest/api/2/version/' + encodeURIComponent(versionId),
+    {
+      method: 'put',
+      contentType: 'application/json',
+      headers: {
+        'Authorization': 'Basic ' + Utilities.base64Encode(userEmail + ':' + apiToken),
+        'Accept': 'application/json'
+      },
+      payload: JSON.stringify({ releaseDate: releaseDate }),
+      muteHttpExceptions: true
+    }
+  );
+
+  if (response.getResponseCode() !== 200) {
+    throw new Error('Jira could not update the release date. HTTP ' + response.getResponseCode() + getSafeJiraValidationMessage(response) + '.');
+  }
+
+  CacheService.getScriptCache().remove(CACHE_KEY);
+  return { id: versionId, releaseDate: releaseDate };
+}
+
+/**
+ * Returns true only for real calendar dates in YYYY-MM-DD format.
+ */
+function isValidIsoDate(value) {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return false;
+  }
+
+  var parts = value.split('-');
+  var year = Number(parts[0]);
+  var month = Number(parts[1]);
+  var day = Number(parts[2]);
+  var parsedDate = new Date(Date.UTC(year, month - 1, day));
+
+  return parsedDate.getUTCFullYear() === year &&
+    parsedDate.getUTCMonth() === month - 1 &&
+    parsedDate.getUTCDate() === day;
+}
+
+/**
  * Extracts a short Jira validation message without returning an unbounded response body.
  */
 function getSafeJiraValidationMessage(response) {

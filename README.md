@@ -10,12 +10,13 @@ A lightweight, secure, responsive, and themeable Google Apps Script web app for 
 - **Dark / Light Mode Support:** Includes a dedicated theme toggle button in the header with high-contrast color palettes for both modes. User preference is saved in `localStorage` and defaults automatically to the user's OS preference.
 - **Pure Client-Side Rendering:** Uses `HtmlService.createHtmlOutputFromFile('Index')` with asynchronous `google.script.run` data fetching. This completely prevents template compilation syntax errors.
 - **Secure Backend Proxy:** Jira authentication credentials (`JIRA_USER_EMAIL` and `JIRA_API_TOKEN`) reside exclusively inside Google Apps Script `Script Properties`. They are **never** exposed in client-side HTML/JavaScript or to site visitors.
-- **Hourly Caching:** Google Apps Script `CacheService` caches Jira releases data for 1 hour (3600 seconds) to ensure near-instant site loading times.
-- **On-Demand Refresh:** A clean "Refresh" button on the UI allows users to invalidate the cache and fetch live data immediately.
+- **Hourly Caching:** Google Apps Script `CacheService` caches Jira releases data for 1 hour (3600 seconds) to ensure near-instant site loading times. Reloading the browser reloads the dashboard but uses this normal cached-data path whenever a valid cache entry exists.
+- **On-Demand Refresh:** The dashboard **Refresh** button bypasses the cache and fetches current release data from Jira immediately.
 - **Optional Google Sites Embedding:** Configured with `XFrameOptionsMode.ALLOWALL` so the web app can also be embedded in a Google Site when needed.
 - **Release Selection:** Shows non-archived, unreleased versions with a planned release date, plus non-archived versions released during calendar year 2026. Released versions are newest first; active versions are ordered by their planned date.
-- **Collapsible Descriptions:** Each release card starts with one **Show description** control. When expanded, its description provides a compact **Edit** action.
+- **Collapsible Descriptions:** Use the header **Show all descriptions** control to expand every available description at once, or hide them all again. Each release card also retains its own **Show description** control and a compact **Edit** action when expanded.
 - **Domain-Restricted Description Editing:** Signed-in `ibex-ai.com` users can edit a release description. The update is sent from Apps Script to Jira with the server-side service account, then the one-hour release cache is cleared so refreshed results show the saved value.
+- **Domain-Restricted Release-Date Editing:** Signed-in `ibex-ai.com` users can select the small **Edit** action beside a release date, choose a valid replacement date, and save it. A date is required and cannot be cleared. Apps Script updates Jira through the server-side service account, clears the cache, and refreshes the dashboard so the release is shown in its newly sorted position.
 
 ---
 
@@ -45,7 +46,7 @@ Use the existing web app URL:
 
 https://script.google.com/a/macros/ibex-ai.com/s/AKfycbzmoYfAQQEVFAvfXqv1ASx7DWo3__scTuBPh5k3FLMrRuRiQr8RQWOY6MVGto-fjvgj/exec
 
-To edit a description, select **Show description**, select **Edit**, make the change, and select **Save description**. Editing is available only to signed-in users in the `ibex-ai.com` domain.
+To view every description, select **Show all descriptions** to the left of the theme control. Select **Hide all descriptions** to collapse them again. To edit one description, select its **Show description**, select **Edit**, make the change, and select **Save description**. To change a release date, select the small **Edit** action in its date badge, choose a valid date, and select **Save date**. A release date cannot be cleared. Editing is available only to signed-in users in the `ibex-ai.com` domain.
 
 ### Step 5: Deploy the New Web App Version
 When you update code in Apps Script, you **must update the active deployment**:
