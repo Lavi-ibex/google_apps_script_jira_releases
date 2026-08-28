@@ -534,14 +534,6 @@
         <div class="label">Released in 2026</div>
         <div class="value" id="kpi-released">-</div>
       </div>
-      <div class="summary-card">
-        <div class="label">Archived</div>
-        <div class="value" id="kpi-archived">-</div>
-      </div>
-      <div class="summary-card">
-        <div class="label">Total Versions</div>
-        <div class="value" id="kpi-total">-</div>
-      </div>
     </div>
 
     <!-- Releases Card List -->
@@ -625,21 +617,17 @@
       
       var countUnreleased = 0;
       var countReleased = 0;
-      var countArchived = 0;
 
       if (!releases || releases.length === 0) {
         container.innerHTML = '<div class="empty-state">No releases found for this Jira project.</div>';
         document.getElementById('kpi-unreleased').textContent = '0';
         document.getElementById('kpi-released').textContent = '0';
-        document.getElementById('kpi-archived').textContent = '0';
-        document.getElementById('kpi-total').textContent = '0';
         return;
       }
 
       var html = '';
       releases.forEach(function(r, index) {
-        if (r.archived) countArchived++;
-        else if (r.released) countReleased++;
+        if (r.released) countReleased++;
         else countUnreleased++;
 
         var badgeClass = 'badge-unreleased';
@@ -711,8 +699,6 @@
       container.innerHTML = html;
       document.getElementById('kpi-unreleased').textContent = countUnreleased;
       document.getElementById('kpi-released').textContent = countReleased;
-      document.getElementById('kpi-archived').textContent = countArchived;
-      document.getElementById('kpi-total').textContent = releases.length;
     }
 
     function toggleDescription(button) {
